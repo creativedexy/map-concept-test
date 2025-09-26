@@ -6,7 +6,6 @@ The Benefact Mapbox Project is a web application designed to showcase various co
 ## Files
 - **index.html**: This is the main application file that contains the Mapbox setup, styles, and JavaScript code for displaying projects on the map. It includes interactive elements such as a search box and filters for project types.
   
-- **about.html**: This page provides additional information about the project, its goals, and relevant details. It may include text, images, and links to other resources.
 
 ## Setup Instructions
 1. Clone the repository to your local machine:
