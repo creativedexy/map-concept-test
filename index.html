@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benefact Trust Projects</title>
+    
+    <!-- Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e1a;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        .brand-header {
+            position: absolute;
+            bottom: 20px;
+            left: 30px;
+            z-index: 1000;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-logo {
+            height: 38px;
+            display: block;
+        }
+        
+        .brand-text {
+            color: #D4AF37;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            margin: 0;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .legend {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 14px;
+            z-index: 1000;
+            min-width: 280px;
+            max-width: 320px;
+        }
+        
+        .legend h3 {
+            margin: 0 0 20px 0;
+            color: #D4AF37;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+        
+        .legend-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            color: white;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .legend-item span {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        
+        .community-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .building-icon {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .controls {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+        
+        .filter-checkboxes {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .checkbox-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(212, 175, 55, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #D4AF37;
+            cursor: pointer;
+        }
+        
+        .checkbox-item span {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .search-box::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #D4AF37;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+        
+        .results-count {
+            margin-top: 16px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Custom popup styling */
+        .mapboxgl-popup-content {
+            background: rgba(15, 23, 42, 0.95) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-radius: 16px !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 8px 16px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+            padding: 0 !important;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
+        
+        .mapboxgl-popup-close-button {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 24px !important;
+            padding: 8px !important;
+            right: 8px !important;
+            top: 8px !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-radius: 50% !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .mapboxgl-popup-close-button:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+        
+        .mapboxgl-popup-tip {
+            border-top-color: rgba(15, 23, 42, 0.95) !important;
+        }
+        
+        .mapboxgl-ctrl-group {
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 8px !important;
+        }
+        
+        .mapboxgl-ctrl-group button {
+            background: transparent !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        
+        .mapboxgl-ctrl-group button:hover {
+            background: rgba(12, 40, 100, 0.1) !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <!-- Brand Header -->
+    <div class="brand-header">
+        <img src="Benefact Logo.svg" alt="Benefact Trust Logo" class="brand-logo" style="height: 38px; display: block;">
+    </div>
+    
+    <!-- Legend and Controls -->
+    <div class="legend">
+        <h3>Project Types</h3>
+        <div class="legend-item">
+            <div class="legend-icon community-icon">♥</div>
+            <span>Community Impact</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-icon building-icon">🏢</div>
+            <span>Building Improvement</span>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Search Projects:</label>
+                <input type="text" id="searchBox" class="search-box" placeholder="Search by title, location, or description...">
+            </div>
+            
+            <div class="control-group">
+                <label>Filter by Type:</label>
+                <div class="filter-checkboxes">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showCommunity" checked>
+                        <span>Community Impact</span>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="showBuilding" checked>
+                        <span>Building Improvement</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="results-count" id="resultsCount">
+                Showing all 30 projects
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mapbox JavaScript -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    
+    <script>
+        // Benefact Trust Projects Data
+        const benefactProjects = [
+            {
+                id: 1,
+                title: "St. Mary's Community Kitchen",
+                description: "Establishing a community kitchen to provide meals for vulnerable families and elderly residents in inner-city Manchester. The project will serve 200 meals weekly and provide cooking skills training.",
+                grantAmount: 45000,
+                website: "www.stmaryscommunitykitchen.org.uk",
+                location: "Manchester",
+                coordinates: [-2.2426, 53.4808],
+                projectType: "Community Impact"
+            },
+            {
+                id: 2,
+                title: "Highland Youth Adventure Centre",
+                description: "Creating an outdoor adventure centre for disadvantaged young people in the Scottish Highlands, offering wilderness skills, confidence building, and mentorship programmes.",
+                grantAmount: 85000,
+                website: "www.highlandyouthadventure.co.uk",
+                location: "Fort William, Scotland",
+                coordinates: [-5.1052, 56.8198],
+                projectType: "Community Impact"
+            },
+            {
+                id: 3,
+                title: "Pembrokeshire Coastal Care",
+                description: "Mobile healthcare service for isolated coastal communities in Pembrokeshire, providing regular health checks and mental health support for elderly residents.",
+                grantAmount: 62000,
+                website: "www.pembscoastalcare.wales",
+                location: "Pembrokeshire, Wales",
+                coordinates: [-4.9603, 51.8175],
+                projectType: "Community Impact"
+            },
+            {
+                id: 4,
+                title: "Belfast Refugee Integration Hub",
+                description: "Supporting newly arrived refugees with English language classes, job training, and cultural integration programmes in partnership with local employers.",
+                grantAmount: 55000,
+                website: "www.belfastrefugeehub.org",
+                location: "Belfast, Northern Ireland",
+                coordinates: [-5.9301, 54.5973],
+                projectType: "Community Impact"
+            },
+            {
+                id: 5,
+                title: "Cornwall Rural Connectivity",
+                description: "Digital inclusion project providing internet access and computer literacy training for isolated farming communities across rural Cornwall.",
+                grantAmount: 38000,
+                website: "www.cornwallconnects.org.uk",
+                location: "Truro, Cornwall",
+                coordinates: [-5.0527, 50.2632],
+                projectType: "Community Impact"
+            },
+            {
+                id: 6,
+                title: "Tower Hamlets Food Growing",
+                description: "Urban farming project converting unused spaces into community gardens, providing fresh produce and gardening education in one of London's most deprived boroughs.",
+                grantAmount: 42000,
+                website: "www.towerhamletsgrowing.org.uk",
+                location: "Tower Hamlets, London",
+                coordinates: [-0.0503, 51.5074],
+                projectType: "Community Impact"
+            },
+            {
+                id: 7,
+                title: "Galway Arts Therapy Centre",
+                description: "Art therapy programmes for children with trauma experiences, providing creative healing through painting, music, and drama in a purpose-built facility.",
+                grantAmount: 67000,
+                website: "www.galwayartstherapy.ie",
+                location: "Galway, Ireland",
+                coordinates: [-9.0568, 53.2707],
+                projectType: "Community Impact"
+            },
+            {
+                id: 8,
+                title: "Yorkshire Dales Mobility Service",
+                description: "Community transport scheme providing accessible vehicles for elderly and disabled residents in remote Yorkshire Dales villages to access essential services.",
+                grantAmount: 73000,
+                website: "www.yorkshiredalesmobility.org.uk",
+                location: "Skipton, Yorkshire",
+                coordinates: [-2.0173, 53.962],
+                projectType: "Community Impact"
+            },
+            {
+                id: 9,
+                title: "Edinburgh Homeless Veterans",
+                description: "Specialist accommodation and support services for homeless military veterans, providing pathway to independent living with mental health and addiction support.",
+                grantAmount: 95000,
+                website: "www.edinburghveteranshelp.org.uk",
+                location: "Edinburgh, Scotland",
+                coordinates: [-3.1883, 55.9533],
+                projectType: "Community Impact"
+            },
+            {
+                id: 10,
+                title: "Kerry Mountain Rescue Training",
+                description: "Enhanced training facility for volunteer mountain rescue teams, including new equipment and simulation training to improve response times in challenging terrain.",
+                grantAmount: 48000,
+                website: "www.kerrymountainrescue.ie",
+                location: "Killarney, Ireland",
+                coordinates: [-9.5043, 52.0599],
+                projectType: "Community Impact"
+            },
+            {
+                id: 11,
+                title: "Birmingham Interfaith Bridge",
+                description: "Community cohesion project bringing together different faith communities through shared social action projects, cultural exchanges, and dialogue programmes.",
+                grantAmount: 52000,
+                website: "www.birminghaminterfaith.org.uk",
+                location: "Birmingham",
+                coordinates: [-1.8904, 52.4862],
+                projectType: "Community Impact"
+            },
+            {
+                id: 12,
+                title: "Shetland Islands Mental Health",
+                description: "Expanding mental health services across the remote Shetland Islands, including peer support groups and crisis intervention training for local volunteers.",
+                grantAmount: 78000,
+                website: "www.shetlandmentalhealth.org.uk",
+                location: "Lerwick, Shetland",
+                coordinates: [-1.1450, 60.1547],
+                projectType: "Community Impact"
+            },
+            {
+                id: 13,
+                title: "Cardiff Prison Education Hub",
+                description: "Educational and rehabilitation programmes for prison leavers, providing vocational training, mentorship, and job placement support to reduce reoffending.",
+                grantAmount: 69000,
+                website: "www.cardiffprisoneducation.wales",
+                location: "Cardiff, Wales",
+                coordinates: [-3.1791, 51.4816],
+                projectType: "Community Impact"
+            },
+            {
+                id: 14,
+                title: "Orkney Renewable Energy Training",
+                description: "Skills training centre for renewable energy technologies, preparing local workers for jobs in wind, tidal, and solar energy projects across the islands.",
+                grantAmount: 87000,
+                website: "www.orkneyrenewabletraining.org.uk",
+                location: "Kirkwall, Orkney",
+                coordinates: [-2.9594, 58.9814],
+                projectType: "Community Impact"
+            },
+            {
+                id: 15,
+                title: "Londonderry Peace Gardens",
+                description: "Creating shared green spaces that bring together communities from different backgrounds, featuring peace education programmes and conflict transformation workshops.",
+                grantAmount: 58000,
+                website: "www.derrypeacegardens.org",
+                location: "Londonderry, Northern Ireland",
+                coordinates: [-7.3086, 55.0067],
+                projectType: "Community Impact"
+            },
+            {
+                id: 16,
+                title: "Cork Harbour Environmental Trust",
+                description: "Marine conservation project protecting Cork Harbour's ecosystem through community education, pollution monitoring, and sustainable fishing practices.",
+                grantAmount: 64000,
+                website: "www.corkharbourenvironment.ie",
+                location: "Cork, Ireland",
+                coordinates: [-8.4863, 51.8985],
+                projectType: "Community Impact"
+            },
+            {
+                id: 17,
+                title: "Newcastle Family Crisis Centre",
+                description: "24/7 support centre for families experiencing domestic violence, providing safe accommodation, legal advice, and children's therapeutic services.",
+                grantAmount: 89000,
+                website: "www.newcastlefamilycrisis.org.uk",
+                location: "Newcastle upon Tyne",
+                coordinates: [-1.6131, 54.9783],
+                projectType: "Community Impact"
+            },
+            {
+                id: 18,
+                title: "Isle of Wight Dementia Friends",
+                description: "Island-wide dementia support network providing respite care, memory cafes, and training for carers and family members across the Isle of Wight.",
+                grantAmount: 46000,
+                website: "www.iowdementiafriends.org.uk",
+                location: "Newport, Isle of Wight",
+                coordinates: [-1.2979, 50.7012],
+                projectType: "Community Impact"
+            },
+            {
+                id: 19,
+                title: "Dublin Tech Inclusion Project",
+                description: "Coding bootcamp and digital skills programme for long-term unemployed individuals, focusing on getting participants into sustainable tech employment.",
+                grantAmount: 71000,
+                website: "www.dublintechinclusion.ie",
+                location: "Dublin, Ireland",
+                coordinates: [-6.2603, 53.3498],
+                projectType: "Community Impact"
+            },
+            {
+                id: 20,
+                title: "Lake District Conservation Corps",
+                description: "Environmental conservation programme engaging young people in protecting the Lake District's natural heritage through hands-on conservation work and environmental education.",
+                grantAmount: 54000,
+                website: "www.lakedistrictcorps.org.uk",
+                location: "Windermere, Lake District",
+                coordinates: [-2.9077, 54.3829],
+                projectType: "Community Impact"
+            },
+            // NEW BUILDING IMPROVEMENT PROJECTS
+            {
+                id: 21,
+                title: "St. Andrew's Church Restoration",
+                description: "Complete restoration of 15th-century church including roof repairs, stone masonry work, and installation of accessible facilities while preserving historical integrity.",
+                grantAmount: 125000,
+                website: "www.standrewsrestoration.org.uk",
+                location: "Canterbury, Kent",
+                coordinates: [1.0789, 51.2802],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 22,
+                title: "Glasgow Community Centre Renovation",
+                description: "Modernising 1960s community centre with energy-efficient heating, accessible toilets, upgraded kitchen facilities, and new meeting rooms for local groups.",
+                grantAmount: 98000,
+                website: "www.glasgowcentrereno.org.uk",
+                location: "Glasgow, Scotland",
+                coordinates: [-4.2518, 55.8642],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 23,
+                title: "Methodist Chapel Accessibility Project",
+                description: "Installing wheelchair ramp, accessible toilets, hearing loop system, and improved lighting to make historic chapel fully accessible to all community members.",
+                grantAmount: 67000,
+                website: "www.methodistaccess.wales",
+                location: "Swansea, Wales",
+                coordinates: [-3.9436, 51.6214],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 24,
+                title: "Village Hall Solar Panel Installation",
+                description: "Installing solar panels and battery storage system to make rural village hall energy self-sufficient and reduce running costs for community activities.",
+                grantAmount: 45000,
+                website: "www.villagehallsolar.org.uk",
+                location: "Cotswolds, Gloucestershire",
+                coordinates: [-1.8330, 51.8330],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 25,
+                title: "Youth Centre Kitchen Upgrade",
+                description: "Complete kitchen refurbishment including commercial-grade equipment, food safety improvements, and expanded capacity for youth cooking programmes and events.",
+                grantAmount: 78000,
+                website: "www.youthcentrekitchen.org.uk",
+                location: "Liverpool",
+                coordinates: [-2.9916, 53.4084],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 26,
+                title: "Heritage Library Roof Repair",
+                description: "Emergency roof repairs and waterproofing for Victorian library building to protect rare book collection and ensure continued public access.",
+                grantAmount: 134000,
+                website: "www.heritagelibraryrepair.org.uk",
+                location: "Bath",
+                coordinates: [-2.3601, 51.3758],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 27,
+                title: "Community Garden Greenhouse Project",
+                description: "Construction of large greenhouse facility with accessible raised beds, tool storage, and educational space for horticultural therapy programmes.",
+                grantAmount: 56000,
+                website: "www.communitygreenhouse.ie",
+                location: "Limerick, Ireland",
+                coordinates: [-8.6267, 52.6638],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 28,
+                title: "Scout Hut Insulation & Heating",
+                description: "Comprehensive insulation upgrade and new heating system installation to make scout hut usable year-round for youth activities and community events.",
+                grantAmount: 43000,
+                website: "www.scouthutupgrade.org.uk",
+                location: "Aberdeen, Scotland",
+                coordinates: [-2.0943, 57.1497],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 29,
+                title: "Synagogue Security Improvements",
+                description: "Enhanced security measures including CCTV installation, reinforced doors and windows, and improved lighting to ensure safe worship and community gatherings.",
+                grantAmount: 72000,
+                website: "www.synagoguesecurity.org.uk",
+                location: "Leeds",
+                coordinates: [-1.5491, 53.8008],
+                projectType: "Building Improvement"
+            },
+            {
+                id: 30,
+                title: "Sports Pavilion Changing Room Upgrade",
+                description: "Modern changing room facilities with accessible showers, improved ventilation, and energy-efficient fixtures for local cricket and football clubs.",
+                grantAmount: 89000,
+                website: "www.sportspavilionupgrade.org.uk",
+                location: "Brighton",
+                coordinates: [-0.1372, 50.8225],
+                projectType: "Building Improvement"
+            }
+        ];
+
+        // Store all markers globally so we can show/hide them
+        let allMarkers = [];
+
+        // Wait for the page to fully load
+        window.addEventListener('load', function() {
+            console.log('Page loaded, mapboxgl object:', mapboxgl);
+            
+            // Your Mapbox access token
+            mapboxgl.accessToken = 'pk.eyJ1IjoiZGV4dGVyLWphbWVzb24iLCJhIjoiY21lbW9jb3hnMHEyYzJrczY5cXN4anJzciJ9.flmKkk5VqdH-l9iBJIue2Q';
+            
+            // Create the map with dark style
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/dark-v11',
+                center: [-3.0, 54.5],
+                zoom: 5.5
+            });
+            
+            // Add navigation controls
+            map.addControl(new mapboxgl.NavigationControl());
+            
+            // Wait for map to load before adding data
+            map.on('load', function() {
+                console.log('Map loaded! Adding project markers...');
+                
+                // Add markers with different styles based on project type
+                benefactProjects.forEach(function(project) {
+                    // Create detailed popup content with Apple styling
+                    const popupContent = `
+                        <div style="
+                            max-width: 320px; 
+                            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+                            padding: 24px;
+                            color: rgba(255, 255, 255, 0.9);
+                        ">
+                            <h3 style="
+                                margin: 0 0 16px 0; 
+                                color: #D4AF37; 
+                                font-size: 20px;
+                                font-weight: 600;
+                                line-height: 1.3;
+                                letter-spacing: 0.3px;
+                            ">
+                                ${project.title}
+                            </h3>
+                            <div style="
+                                margin-bottom: 12px;
+                                padding: 12px;
+                                background: rgba(212, 175, 55, 0.1);
+                                border-radius: 12px;
+                                border: 1px solid rgba(212, 175, 55, 0.2);
+                            ">
+                                <strong style="color: #D4AF37; font-weight: 600;">Grant Award:</strong> 
+                                <span style="
+                                    font-weight: 700; 
+                                    color: #D4AF37;
+                                    font-size: 16px;
+                                    margin-left: 8px;
+                                ">£${project.grantAmount.toLocaleString()}</span>
+                            </div>
+                            <div style="
+                                margin-bottom: 12px;
+                                display: flex;
+                                align-items: center;
+                            ">
+                                <strong style="
+                                    color: rgba(255, 255, 255, 0.7); 
+                                    font-weight: 600;
+                                    min-width: 80px;
+                                ">Location:</strong> 
+                                <span style="
+                                    color: rgba(255, 255, 255, 0.9);
+                                    margin-left: 8px;
+                                ">${project.location}</span>
+                            </div>
+                            <div style="
+                                margin-bottom: 16px;
+                                display: flex;
+                                align-items: center;
+                            ">
+                                <strong style="
+                                    color: rgba(255, 255, 255, 0.7); 
+                                    font-weight: 600;
+                                    min-width: 80px;
+                                ">Type:</strong> 
+                                <span style="
+                                    background: ${project.projectType === 'Building Improvement' ? 'linear-gradient(135deg, #3498db, #2980b9)' : 'linear-gradient(135deg, #e74c3c, #c0392b)'};
+                                    color: white;
+                                    padding: 4px 12px;
+                                    border-radius: 20px;
+                                    font-size: 12px;
+                                    font-weight: 600;
+                                    margin-left: 8px;
+                                ">${project.projectType}</span>
+                            </div>
+                            <div style="
+                                margin-bottom: 20px;
+                                padding: 16px;
+                                background: rgba(255, 255, 255, 0.05);
+                                border-radius: 12px;
+                                border: 1px solid rgba(255, 255, 255, 0.1);
+                            ">
+                                <strong style="
+                                    color: rgba(255, 255, 255, 0.8);
+                                    font-weight: 600;
+                                    display: block;
+                                    margin-bottom: 8px;
+                                ">Description:</strong>
+                                <span style="
+                                    color: rgba(255, 255, 255, 0.8); 
+                                    line-height: 1.5; 
+                                    font-size: 14px;
+                                    font-weight: 400;
+                                ">
+                                    ${project.description}
+                                </span>
+                            </div>
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                                <strong>Website:</strong> 
+                                <a href="http://${project.website}" target="_blank" style="color: #3498db; text-decoration: none;">
+                                    ${project.website}
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Create popup
+                    const popup = new mapboxgl.Popup({
+                        offset: 25
+                    }).setHTML(popupContent);
+                    
+                    // Create custom marker element based on project type
+                    const markerElement = document.createElement('div');
+                    markerElement.style.width = '30px';
+                    markerElement.style.height = '30px';
+                    markerElement.style.borderRadius = '50%';
+                    markerElement.style.border = '2px solid white';
+                    markerElement.style.cursor = 'pointer';
+                    markerElement.style.display = 'flex';
+                    markerElement.style.alignItems = 'center';
+                    markerElement.style.justifyContent = 'center';
+                    markerElement.style.fontSize = '14px';
+                    markerElement.style.fontWeight = 'bold';
+                    markerElement.style.color = 'white';
+                    markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+                    
+                    if (project.projectType === 'Building Improvement') {
+                        markerElement.style.backgroundColor = '#3498db'; // Blue
+                        markerElement.innerHTML = '🏢';
+                    } else {
+                        markerElement.style.backgroundColor = '#e74c3c'; // Red
+                        markerElement.innerHTML = '♥';
+                    }
+                    
+                    // Create marker with custom element
+                    const marker = new mapboxgl.Marker(markerElement)
+                        .setLngLat(project.coordinates)
+                        .setPopup(popup)
+                        .addTo(map);
+
+                    // Store marker and project reference
+                    allMarkers.push({ marker, project });
+                });
+                console.log(`All ${benefactProjects.length} markers with detailed popups added!`);
+            });
+        });
+
+        function setupFilters() {
+            const showCommunity = document.getElementById('showCommunity');
+            const showBuilding = document.getElementById('showBuilding');
+            const searchBox = document.getElementById('searchBox');
+            const resultsCount = document.getElementById('resultsCount');
+
+            function filterMarkers() {
+                const showCommunityVal = showCommunity.checked;
+                const showBuildingVal = showBuilding.checked;
+                const searchVal = searchBox.value.trim().toLowerCase();
+
+                let visibleCount = 0;
+
+                allMarkers.forEach(({ marker, project }) => {
+                    // Filter by type
+                    let typeMatch = 
+                        (project.projectType === 'Community Impact' && showCommunityVal) ||
+                        (project.projectType === 'Building Improvement' && showBuildingVal);
+
+                    // Filter by search
+                    let searchMatch = 
+                        project.title.toLowerCase().includes(searchVal) ||
+                        project.location.toLowerCase().includes(searchVal) ||
+                        project.description.toLowerCase().includes(searchVal);
+
+                    if (typeMatch && (searchVal === '' || searchMatch)) {
+                        marker.addTo(map); // Show marker (keeps styling and centering)
+                        visibleCount++;
+                    } else {
+                        marker.remove(); // Hide marker
+                    }
+                });
+
+                // Update results count
+                resultsCount.textContent = `Showing ${visibleCount} project${visibleCount === 1 ? '' : 's'}`;
+            }
+
+            // Attach event listeners
+            showCommunity.addEventListener('change', filterMarkers);
+            showBuilding.addEventListener('change', filterMarkers);
+            searchBox.addEventListener('input', filterMarkers);
+
+            // Initial filter
+            filterMarkers();
+        }
+
+        // Initial setup of filters
+        setupFilters();
+    </script>
+</body>
+</html>
