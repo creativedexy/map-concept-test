@@ -415,7 +415,68 @@
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 8px !important;
         }
-        
+        /* Responsive popup styling */
+        .mapboxgl-popup {
+            max-width: none !important;
+        }
+
+        @media screen and (min-width: 1400px) {
+            .mapboxgl-popup-content {
+                max-width: 380px !important;
+            }
+        }
+
+        @media screen and (min-width: 1024px) and (max-width: 1399px) {
+            .mapboxgl-popup-content {
+                max-width: 340px !important;
+            }
+        }
+
+        @media screen and (min-width: 769px) and (max-width: 1023px) {
+            .mapboxgl-popup-content {
+                max-width: 320px !important;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .mapboxgl-popup-content {
+                max-width: calc(100vw - 60px) !important;
+                font-size: 13px !important;
+            }
+            
+            .mapboxgl-popup-content h3 {
+                font-size: 17px !important;
+            }
+            
+            .mapboxgl-popup-content strong {
+                font-size: 12px !important;
+            }
+            
+            .mapboxgl-popup-content span {
+                font-size: 13px !important;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .mapboxgl-popup-content {
+                max-width: calc(100vw - 40px) !important;
+                padding: 18px !important;
+                font-size: 12px !important;
+            }
+            
+            .mapboxgl-popup-content h3 {
+                font-size: 16px !important;
+                margin-bottom: 12px !important;
+            }
+            
+            .mapboxgl-popup-content strong {
+                font-size: 11px !important;
+            }
+            
+            .mapboxgl-popup-content span {
+                font-size: 12px !important;
+            }
+        }
         .mapboxgl-ctrl-group button {
             background: transparent !important;
             color: rgba(255, 255, 255, 0.8) !important;
@@ -454,7 +515,7 @@
             <span>Community Impact</span>
         </div>
         <div class="legend-item">
-            <div class="legend-icon building-icon">🏢</div>
+            <div class="legend-icon building-icon">⛪</div>
             <span>Building Improvement</span>
         </div>
         
@@ -977,7 +1038,7 @@
                     
                     if (project.projectType === 'Building Improvement') {
                         markerElement.style.backgroundColor = '#3498db';
-                        markerElement.innerHTML = '🏢';
+                        markerElement.innerHTML = '⛪';
                     } else {
                         markerElement.style.backgroundColor = '#e74c3c';
                         markerElement.innerHTML = '♥';
