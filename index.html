@@ -6,7 +6,7 @@
     <title>Benefact Trust Projects</title>
     
     <!-- Mapbox CSS -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.css" rel="stylesheet">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
@@ -39,11 +39,6 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
-        .brand-logo {
-            height: 38px;
-            display: block;
-        }
-        
         .brand-text {
             color: #D4AF37;
             font-size: 18px;
@@ -57,21 +52,77 @@
             position: absolute;
             top: 20px;
             left: 30px;
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
             padding: 24px;
-            border-radius: 16px;
+            border-radius: 16px 0 16px 16px;
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                0 2px 8px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                0 8px 32px rgba(0, 0, 0, 0.15),
+                0 2px 8px rgba(0, 0, 0, 0.1);
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
             font-size: 14px;
             z-index: 1000;
             min-width: 280px;
             max-width: 320px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .legend.collapsed {
+            transform: translateX(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .legend-toggle {
+            position: absolute;
+            top: 20px;
+            left: 359px;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-left: 2px solid rgba(128, 128, 128, 0.3);
+            border-radius: 0 8px 8px 0;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #0F172A;
+            font-size: 18px;
+        }
+        
+        .legend-toggle:hover {
+            background: white;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .legend-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        .legend-toggle-icon {
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .legend-toggle.collapsed {
+            left: 30px;
+            border-radius: 8px;
+            border-right: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .legend-toggle.collapsed .legend-toggle-icon {
+            transform: rotate(180deg);
         }
         
         .legend h3 {
@@ -100,11 +151,11 @@
             font-weight: 500;
             color: white;
             font-size: 13px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
         
         .legend-item span {
-            color: rgba(255, 255, 255, 0.9);
+            color: #0F172A;
             font-weight: 500;
         }
         
@@ -119,7 +170,7 @@
         .controls {
             margin-top: 24px;
             padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(15, 23, 42, 0.1);
         }
         
         .control-group {
@@ -130,7 +181,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
+            color: #D4AF37;
             font-size: 13px;
             letter-spacing: 0.3px;
         }
@@ -146,17 +197,17 @@
             align-items: center;
             padding: 12px 14px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(15, 23, 42, 0.03);
+            border: 1px solid rgba(15, 23, 42, 0.08);
             transition: all 0.3s ease;
             cursor: pointer;
         }
         
         .checkbox-item:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(15, 23, 42, 0.05);
             border-color: rgba(212, 175, 55, 0.4);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
         
         .checkbox-item input[type="checkbox"] {
@@ -168,7 +219,7 @@
         }
         
         .checkbox-item span {
-            color: rgba(255, 255, 255, 0.85);
+            color: #0F172A;
             font-weight: 500;
             font-size: 14px;
         }
@@ -176,37 +227,145 @@
         .search-box {
             width: 100%;
             padding: 14px 16px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(15, 23, 42, 0.15);
             border-radius: 12px;
             font-size: 14px;
-            background: rgba(255, 255, 255, 0.08);
-            color: rgba(255, 255, 255, 0.9);
+            background: white;
+            color: #0F172A;
             font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
             transition: all 0.3s ease;
             box-sizing: border-box;
         }
         
         .search-box::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(15, 23, 42, 0.5);
         }
         
         .search-box:focus {
             outline: none;
             border-color: #D4AF37;
-            background: rgba(255, 255, 255, 0.12);
+            background: white;
             box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
         }
         
         .results-count {
             margin-top: 16px;
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(15, 23, 42, 0.6);
             font-weight: 500;
             text-align: center;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.05);
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+        }
+        
+        /* Mobile Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .brand-header {
+                bottom: 10px;
+                left: 10px;
+                padding: 8px 12px;
+                border-radius: 8px;
+            }
+            
+            .brand-text {
+                font-size: 14px;
+            }
+            
+            .legend {
+                top: 10px;
+                left: 10px;
+                right: 60px;
+                max-width: calc(100% - 70px);
+                min-width: auto;
+                padding: 16px;
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
+                border-radius: 16px 0 16px 16px;
+            }
+            
+            .legend h3 {
+                font-size: 18px;
+                margin-bottom: 16px;
+            }
+            
+            .legend-toggle {
+                top: 10px;
+                left: auto;
+                right: 10px;
+                width: 36px;
+                height: 36px;
+                border-radius: 0 8px 8px 0;
+                border-right: 2px solid rgba(128, 128, 128, 0.3);
+            }
+            
+            .legend-toggle.collapsed {
+                left: auto;
+                right: 10px;
+                border-radius: 8px;
+                border-right: 1px solid rgba(212, 175, 55, 0.3);
+            }
+            
+            .legend-toggle-icon {
+                font-size: 18px;
+            }
+            
+            .controls {
+                margin-top: 16px;
+                padding-top: 16px;
+            }
+            
+            .control-group {
+                margin-bottom: 16px;
+            }
+            
+            .search-box {
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+            
+            .checkbox-item {
+                padding: 10px 12px;
+            }
+            
+            .checkbox-item span {
+                font-size: 13px;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            .legend h3 {
+                font-size: 16px;
+            }
+            
+            .legend-item {
+                margin-bottom: 8px;
+                padding: 6px 0;
+            }
+            
+            .legend-icon {
+                width: 20px;
+                height: 20px;
+                font-size: 11px;
+                margin-right: 10px;
+            }
+            
+            .legend-item span {
+                font-size: 13px;
+            }
+            
+            .filter-checkboxes {
+                gap: 8px;
+            }
+            
+            .checkbox-item {
+                padding: 8px 10px;
+            }
+            
+            .brand-header img {
+                height: 30px !important;
+            }
         }
         
         /* Custom popup styling */
@@ -250,7 +409,7 @@
         }
         
         .mapboxgl-ctrl-group {
-            background: rgba(15, 23, 42, 0.85) !important;
+            background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(20px) !important;
             -webkit-backdrop-filter: blur(20px) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -263,21 +422,32 @@
         }
         
         .mapboxgl-ctrl-group button:hover {
-            background: rgba(12, 40, 100, 0.1) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
             color: white !important;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .mapboxgl-popup-content {
+                max-width: 280px !important;
+            }
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
     
+    <!-- Toggle Button -->
+    <button class="legend-toggle" id="legendToggle">
+        <span class="legend-toggle-icon">◄</span>
+    </button>
+    
     <!-- Brand Header -->
     <div class="brand-header">
-        <img src="Benefact Logo.svg" alt="Benefact Trust Logo" class="brand-logo" style="height: 38px; display: block;">
+        <img src="c:\Users\dexte\Basic Mapbox Setup\Benefact Logo.svg" alt="Benefact Trust Logo" style="height: 40px; vertical-align: middle;">
     </div>
     
     <!-- Legend and Controls -->
-    <div class="legend">
+    <div class="legend" id="legend">
         <h3>Project Types</h3>
         <div class="legend-item">
             <div class="legend-icon community-icon">♥</div>
@@ -315,7 +485,7 @@
     </div>
     
     <!-- Mapbox JavaScript -->
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.15.0/mapbox-gl.js"></script>
     
     <script>
         // Benefact Trust Projects Data
@@ -520,7 +690,6 @@
                 coordinates: [-2.9077, 54.3829],
                 projectType: "Community Impact"
             },
-            // NEW BUILDING IMPROVEMENT PROJECTS
             {
                 id: 21,
                 title: "St. Andrew's Church Restoration",
@@ -625,18 +794,41 @@
 
         // Store all markers globally so we can show/hide them
         let allMarkers = [];
+        let map;
+
+        // Toggle legend visibility
+        function setupLegendToggle() {
+            const toggle = document.getElementById('legendToggle');
+            const legend = document.getElementById('legend');
+            
+            // Check localStorage for saved state
+            const isCollapsed = localStorage.getItem('legendCollapsed') === 'true';
+            if (isCollapsed) {
+                legend.classList.add('collapsed');
+                toggle.classList.add('collapsed');
+            }
+            
+            toggle.addEventListener('click', function() {
+                const isNowCollapsed = legend.classList.toggle('collapsed');
+                toggle.classList.toggle('collapsed');
+                
+                // Save state to localStorage
+                localStorage.setItem('legendCollapsed', isNowCollapsed);
+            });
+        }
 
         // Wait for the page to fully load
         window.addEventListener('load', function() {
-            console.log('Page loaded, mapboxgl object:', mapboxgl);
+            // Setup legend toggle
+            setupLegendToggle();
             
             // Your Mapbox access token
             mapboxgl.accessToken = 'pk.eyJ1IjoiZGV4dGVyLWphbWVzb24iLCJhIjoiY21lbW9jb3hnMHEyYzJrczY5cXN4anJzciJ9.flmKkk5VqdH-l9iBJIue2Q';
             
-            // Create the map with dark style
+            // Create the map with custom style
             map = new mapboxgl.Map({
                 container: 'map',
-                style: 'mapbox://styles/mapbox/dark-v11',
+                style: 'mapbox://styles/dexter-jameson/cmg4w8zu0004o01qzc9zm0urd',
                 center: [-3.0, 54.5],
                 zoom: 5.5
             });
@@ -646,11 +838,9 @@
             
             // Wait for map to load before adding data
             map.on('load', function() {
-                console.log('Map loaded! Adding project markers...');
-                
                 // Add markers with different styles based on project type
                 benefactProjects.forEach(function(project) {
-                    // Create detailed popup content with Apple styling
+                    // Create detailed popup content
                     const popupContent = `
                         <div style="
                             max-width: 320px; 
@@ -740,10 +930,26 @@
                                     ${project.description}
                                 </span>
                             </div>
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                                <strong>Website:</strong> 
-                                <a href="http://${project.website}" target="_blank" style="color: #3498db; text-decoration: none;">
-                                    ${project.website}
+                            <div style="
+                                margin-top: 16px; 
+                                padding-top: 16px; 
+                                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                                text-align: center;
+                            ">
+                                <a href="http://${project.website}" target="_blank" style="
+                                    display: inline-block;
+                                    background: linear-gradient(135deg, #D4AF37, #B8941F);
+                                    color: #0F172A;
+                                    text-decoration: none;
+                                    padding: 10px 20px;
+                                    border-radius: 25px;
+                                    font-weight: 600;
+                                    font-size: 14px;
+                                    transition: all 0.2s ease;
+                                    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+                                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(212, 175, 55, 0.4)'" 
+                                   onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(212, 175, 55, 0.3)'">
+                                    Visit Website →
                                 </a>
                             </div>
                         </div>
@@ -754,7 +960,7 @@
                         offset: 25
                     }).setHTML(popupContent);
                     
-                    // Create custom marker element based on project type
+                    // Create custom marker element
                     const markerElement = document.createElement('div');
                     markerElement.style.width = '30px';
                     markerElement.style.height = '30px';
@@ -770,23 +976,24 @@
                     markerElement.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
                     
                     if (project.projectType === 'Building Improvement') {
-                        markerElement.style.backgroundColor = '#3498db'; // Blue
+                        markerElement.style.backgroundColor = '#3498db';
                         markerElement.innerHTML = '🏢';
                     } else {
-                        markerElement.style.backgroundColor = '#e74c3c'; // Red
+                        markerElement.style.backgroundColor = '#e74c3c';
                         markerElement.innerHTML = '♥';
                     }
                     
-                    // Create marker with custom element
+                    // Create marker
                     const marker = new mapboxgl.Marker(markerElement)
                         .setLngLat(project.coordinates)
                         .setPopup(popup)
                         .addTo(map);
 
-                    // Store marker and project reference
                     allMarkers.push({ marker, project });
                 });
-                console.log(`All ${benefactProjects.length} markers with detailed popups added!`);
+                
+                // Setup filters after markers are loaded
+                setupFilters();
             });
         });
 
@@ -816,10 +1023,10 @@
                         project.description.toLowerCase().includes(searchVal);
 
                     if (typeMatch && (searchVal === '' || searchMatch)) {
-                        marker.addTo(map); // Show marker (keeps styling and centering)
+                        marker.addTo(map);
                         visibleCount++;
                     } else {
-                        marker.remove(); // Hide marker
+                        marker.remove();
                     }
                 });
 
@@ -831,13 +1038,7 @@
             showCommunity.addEventListener('change', filterMarkers);
             showBuilding.addEventListener('change', filterMarkers);
             searchBox.addEventListener('input', filterMarkers);
-
-            // Initial filter
-            filterMarkers();
         }
-
-        // Initial setup of filters
-        setupFilters();
     </script>
 </body>
 </html>
